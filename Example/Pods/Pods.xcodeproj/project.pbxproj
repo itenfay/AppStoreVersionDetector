@@ -10,7 +10,7 @@
 		16C9A738B992CB50D3916E60A38142EB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		2163550495197B488FB3D1BDF69F140A /* Pods-AppStoreVersionDetector_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = F0D451AB09E98588A8479D185FA2C3D8 /* Pods-AppStoreVersionDetector_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7552C96E52340C0CC8A520AD32DFC96F /* Pods-AppStoreVersionDetector_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = AE4907C44E4DBF331568612845D713FC /* Pods-AppStoreVersionDetector_Tests-dummy.m */; };
-		795E56B528DB14AB0053468E /* AppStoreVersionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795E56B428DB14AB0053468E /* AppStoreVersionDetector.swift */; };
+		795E56B728DB33150053468E /* AppStoreVersionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795E56B628DB33150053468E /* AppStoreVersionDetector.swift */; };
 		878AED958656EC5EBAA6E52AD0A6903E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		A6276E7EBF133FEFB820AFB65083E5B3 /* AppStoreVersionDetector-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = FBEA43C5E817F70BCE07830F1C9938CE /* AppStoreVersionDetector-dummy.m */; };
 		D94F86C689468A0421238D5A78C40B91 /* Pods-AppStoreVersionDetector_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D3BEE95678A0164934EC7F317D044F14 /* Pods-AppStoreVersionDetector_Example-dummy.m */; };
@@ -49,7 +49,7 @@
 		74F2E5B2A193D060D347C0B26804779C /* Pods-AppStoreVersionDetector_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-AppStoreVersionDetector_Example.modulemap"; sourceTree = "<group>"; };
 		77AD829419B52019D49CF2EE8C2431ED /* AppStoreVersionDetector-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AppStoreVersionDetector-prefix.pch"; sourceTree = "<group>"; };
 		785D8EC0B0C6A0B8D15448772A96C6B8 /* AppStoreVersionDetector-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "AppStoreVersionDetector-Info.plist"; sourceTree = "<group>"; };
-		795E56B428DB14AB0053468E /* AppStoreVersionDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppStoreVersionDetector.swift; path = AppStoreVersionDetector/AppStoreVersionDetector/Classes/AppStoreVersionDetector.swift; sourceTree = "<group>"; };
+		795E56B628DB33150053468E /* AppStoreVersionDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppStoreVersionDetector.swift; path = AppStoreVersionDetector/Classes/AppStoreVersionDetector.swift; sourceTree = "<group>"; };
 		811873DE764392F9252BD931DF689695 /* Pods-AppStoreVersionDetector_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-AppStoreVersionDetector_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		874AA407C0D7EC9133D2B6DB79A81E89 /* Pods-AppStoreVersionDetector_Tests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-AppStoreVersionDetector_Tests-Info.plist"; sourceTree = "<group>"; };
 		8BED9E3FB1D2AFA38685E71E34F8866A /* AppStoreVersionDetector.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AppStoreVersionDetector.release.xcconfig; sourceTree = "<group>"; };
@@ -138,7 +138,7 @@
 		86F4BC1F50E708357ACEB6A89CE323D9 /* AppStoreVersionDetector */ = {
 			isa = PBXGroup;
 			children = (
-				795E56B428DB14AB0053468E /* AppStoreVersionDetector.swift */,
+				795E56B628DB33150053468E /* AppStoreVersionDetector.swift */,
 				D4DB7525EB292C2B2F43F179CDCB1D73 /* Pod */,
 				F42DD1C26C44AABD1788C6652F16E95A /* Support Files */,
 			);
@@ -372,7 +372,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				795E56B528DB14AB0053468E /* AppStoreVersionDetector.swift in Sources */,
+				795E56B728DB33150053468E /* AppStoreVersionDetector.swift in Sources */,
 				A6276E7EBF133FEFB820AFB65083E5B3 /* AppStoreVersionDetector-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
