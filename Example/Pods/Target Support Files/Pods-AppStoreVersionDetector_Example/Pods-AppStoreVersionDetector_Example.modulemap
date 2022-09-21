@@ -1,0 +1,6 @@
+framework module Pods_AppStoreVersionDetector_Example {
+  umbrella header "Pods-AppStoreVersionDetector_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

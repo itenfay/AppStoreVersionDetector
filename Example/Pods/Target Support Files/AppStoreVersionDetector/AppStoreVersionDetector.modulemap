@@ -1,0 +1,6 @@
+framework module AppStoreVersionDetector {
+  umbrella header "AppStoreVersionDetector-umbrella.h"
+
+  export *
+  module * { export * }
+}
