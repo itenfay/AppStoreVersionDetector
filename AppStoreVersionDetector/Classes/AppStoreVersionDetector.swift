@@ -27,7 +27,7 @@ final public class AppStoreVersionDetector {
     /// Callbacks the result for the detecting.
     private var completionHandler: ((Result) -> Void)?
     /// Whether to has the new version.
-    var hasNewVersion: Bool = false
+    public var hasNewVersion: Bool = false
     
     /// Detect the version only in release product.
     /// - Parameters:

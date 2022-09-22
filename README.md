@@ -1,11 +1,11 @@
 # AppStoreVersionDetector
 
+Detects the app version from AppStore.
+
 [![CI Status](https://img.shields.io/travis/chenxing640/AppStoreVersionDetector.svg?style=flat)](https://travis-ci.org/chenxing640/AppStoreVersionDetector)
 [![Version](https://img.shields.io/cocoapods/v/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
 [![License](https://img.shields.io/cocoapods/l/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
 [![Platform](https://img.shields.io/cocoapods/p/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
-
-Detects the app version from AppStore.
 
 
 ## Example

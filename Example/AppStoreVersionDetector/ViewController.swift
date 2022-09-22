@@ -13,6 +13,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("hasNewVersion: \(AppStoreVDetector.default.hasNewVersion)")
+        
         AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { result in
             switch result {
             case .success(let hasNew):
