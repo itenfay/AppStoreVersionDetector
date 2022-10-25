@@ -27,7 +27,9 @@ final public class AppStoreVersionDetector {
     /// Callbacks the result for the detecting.
     private var completionHandler: ((Result) -> Void)?
     /// Whether to has the new version.
-    public var hasNewVersion: Bool = false
+    public private(set) var hasNewVersion: Bool = false
+    /// Whether to allow to present the alert controller.
+    public var alertAllowed: Bool = true
     
     /// Detect the version only in release product.
     /// - Parameters:
@@ -139,6 +141,7 @@ final public class AppStoreVersionDetector {
                 DispatchQueue.main.async {
                     self.hasNewVersion = true
                     self.completionHandler?(Result.success(true))
+                    if !self.alertAllowed { return }
                     let alertController = UIAlertController.init(title: "发现新版本", message: "", preferredStyle: .alert)
                     let cancelAction = UIAlertAction.init(title: "下次再说", style: .cancel) { alertAction in }
                     let updateAction = UIAlertAction.init(title: "立即更新", style: .default) { alertAction in
