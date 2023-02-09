@@ -43,7 +43,7 @@ AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { resul
 - Open AppStore
 
 ```
-AppStoreVDetector.default.openAppStore(with: "15674646463")
+AppStoreVDetector.openAppStore(with: "15674646463")
 ```
 
 
