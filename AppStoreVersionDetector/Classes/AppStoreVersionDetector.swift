@@ -18,13 +18,13 @@ final public class AppStoreVersionDetector {
     private init() {}
     
     public enum Result {
-        case success(Bool)
+        case success(Bool, [String : String]?)
         case failure(String)
     }
     
     /// The app's id.
-    private var appId: String = ""
-    /// Callbacks the result for the detecting.
+    public private(set) var appId: String = ""
+    /// Callback the result for the detecting.
     private var completionHandler: ((Result) -> Void)?
     /// Whether to has the new version.
     public private(set) var hasNewVersion: Bool = false
@@ -119,54 +119,42 @@ final public class AppStoreVersionDetector {
                 return
             }
             let version = "\(subDict["version"] ?? "")"
-            let compResult = compareVersion(with: version)
+            let compResult = self.compareVersion(with: version)
             if compResult == .orderedAscending {
                 debugPrint("[VD] The online version is greater than the local.")
-                
                 let releaseNotes = "\(subDict["releaseNotes"] ?? "")"
-                let dateStr = "\(subDict["currentVersionReleaseDate"] ?? "")"
-                debugPrint("[VD] date: \(dateStr)")
+                let vReleaseDate = "\(subDict["currentVersionReleaseDate"] ?? "")"
+                debugPrint("[VD] date: \(vReleaseDate)")
                 
                 let dateFormatter = DateFormatter.init()
                 dateFormatter.timeZone = NSTimeZone.init(name: "UTC")! as TimeZone
                 dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-                var releaseDateStr = ""
-                if let releaseDate = dateFormatter.date(from: dateStr) {
+                var releaseDate = ""
+                if let _releaseDate = dateFormatter.date(from: vReleaseDate) {
                     let dateFormatter = DateFormatter.init()
                     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-                    releaseDateStr = dateFormatter.string(from: releaseDate)
+                    releaseDate = dateFormatter.string(from: _releaseDate)
                 }
-                debugPrint("[VD] releaseDate: \(releaseDateStr)")
+                debugPrint("[VD] releaseDate: \(releaseDate)")
                 
                 DispatchQueue.main.async {
                     self.hasNewVersion = true
-                    self.completionHandler?(Result.success(true))
+                    let updatedInfo = ["version" : version, "releaseDate" : releaseDate, "releaseNotes" : releaseNotes]
+                    self.completionHandler?(Result.success(true, updatedInfo))
                     if !self.alertAllowed { return }
-                    let alertController = UIAlertController.init(title: "发现新版本", message: "", preferredStyle: .alert)
-                    let cancelAction = UIAlertAction.init(title: "下次再说", style: .cancel) { alertAction in }
-                    let updateAction = UIAlertAction.init(title: "立即更新", style: .default) { alertAction in
-                        AppStoreVersionDetector.gotoAppStore(id: self.appId)
+                    let message = "版本号：\(version)\n" + "更新时间：\n\(releaseDate)\n" + "\n更新说明：\n\(releaseNotes)"
+                    let alertController = Self.makeAlertController(title: "发现新版本，是否前往更新？", message: message, alignment: .left, cancelTitle: "下次再说", defaultTitle: "立即更新") { _ in
+                        let vDetector = AppStoreVersionDetector.default
+                        Self.openAppStore(with: vDetector.appId)
                     }
-                    alertController.addAction(cancelAction)
-                    alertController.addAction(updateAction)
-                    let message = "版本：\n\(version)\n" + "更新时间：\n\(releaseDateStr)\n" + "\n更新说明：\n\(releaseNotes)\n"
-                    let attributedMessage = NSMutableAttributedString.init(string: message)
-                    let paragraph = NSMutableParagraphStyle.init()
-                    paragraph.alignment = .left
-                    let font = UIFont.systemFont(ofSize: 13, weight: .regular)
-                    attributedMessage.setAttributes(
-                        [NSAttributedString.Key.paragraphStyle: paragraph, NSAttributedString.Key.font: font],
-                        range: NSRange.init(location: 0, length: attributedMessage.length)
-                    )
-                    alertController.setValue(attributedMessage, forKey: "attributedMessage")
-                    vd_queryCurrentController()?.present(alertController, animated: true)
+                    Self.queryCurrentController()?.present(alertController, animated: true)
                 }
             } else if compResult == .orderedSame {
                 debugPrint("[VD] The local version is equal to the online.")
-                self.completionHandler?(Result.success(false))
+                self.completionHandler?(Result.success(false, nil))
             } else {
                 debugPrint("[VD] The local version is greater than the online.")
-                self.completionHandler?(Result.success(false))
+                self.completionHandler?(Result.success(false, nil))
             }
         } catch let error {
             debugPrint("[VD] Parse error: \(error)")
@@ -174,21 +162,28 @@ final public class AppStoreVersionDetector {
         }
     }
     
-    /// Go to AppStore by the open url.
-    /// - Parameter id: The app's id.
-    public static func gotoAppStore(id: String) {
-        let appUrl = "https://apps.apple.com/cn/app/id\(id)?mt=8"
+    /// Open AppStore by the open url.
+    /// - Parameter id: The app's identifier.
+    public static func openAppStore(with appId: String) {
+        let appUrl = "https://apps.apple.com/cn/app/id\(appId)?mt=8"
         guard let url = URL.init(string: appUrl) else {
-            debugPrint("[VD] gotoAppStore: url is null.")
+            debugPrint("[VD] openAppStore: url is null.")
             return
         }
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
+        //if UIApplication.shared.canOpenURL(url) {}
+        Self.openUrl(url)
+    }
+    
+    /// Attempts to asynchronously open the resource at the specified URL.
+    /// - Parameters:
+    ///   - url: A URL (Universal Resource Locator).
+    ///   - completion: The block to execute with the results. Provide a value for this parameter if you want to be informed of the success or failure of opening the URL.
+    public static func openUrl(_ url: URL, completionHandler completion: ((Bool) -> Void)? = nil) {
+        UIApplication.shared.open(url, options: [:], completionHandler: completion)
     }
     
     /// Compare with the local and online version, then return the comparison result.
-    private func compareVersion(with onlineVersion: String) -> ComparisonResult {
+    public func compareVersion(with onlineVersion: String) -> ComparisonResult {
         let infoDictionary = Bundle.main.infoDictionary!
         let majorVersion = infoDictionary["CFBundleShortVersionString"] as! String
         let appVerNums = majorVersion.components(separatedBy: ".")
@@ -215,6 +210,51 @@ final public class AppStoreVersionDetector {
         }
     }
     
+    /// Query the current controller.
+    public static func queryCurrentController(
+        _ controller: UIViewController? = UIApplication.shared.vd_keyWindow?.rootViewController
+    ) -> UIViewController? {
+        if let navigationController = controller as? UINavigationController {
+            return queryCurrentController(navigationController.visibleViewController)
+        }
+        if let tabBarController = controller as? UITabBarController {
+            if let selectedController = tabBarController.selectedViewController {
+                return queryCurrentController(selectedController)
+            }
+        }
+        if let presentedController = controller?.presentedViewController {
+            return queryCurrentController(presentedController)
+        }
+        return controller
+    }
+    
+    /// Make an object that displays an alert message.
+    public static func makeAlertController(title: String, message: String, alignment: NSTextAlignment = .center, font: UIFont = UIFont.systemFont(ofSize: 13, weight: .regular), cancelTitle: String?, cancelAction: ((String?) -> Void)? = nil, defaultTitle: String, defaultAction: ((String?) -> Void)? = nil) -> UIAlertController {
+        let alertController = UIAlertController.init(title: title, message: "", preferredStyle: .alert)
+        
+        if let _cancelTitle = cancelTitle, !_cancelTitle.isEmpty {
+            let cancelAction = UIAlertAction.init(title: _cancelTitle, style: .cancel) { action in
+                cancelAction?(action.title)
+            }
+            alertController.addAction(cancelAction)
+        }
+        let defaultAction = UIAlertAction.init(title: defaultTitle, style: .default) { action in
+            defaultAction?(action.title)
+        }
+        alertController.addAction(defaultAction)
+        
+        let attributedMessage = NSMutableAttributedString.init(string: message)
+        let paragraph = NSMutableParagraphStyle.init()
+        paragraph.alignment = alignment
+        attributedMessage.setAttributes(
+            [NSAttributedString.Key.paragraphStyle: paragraph, NSAttributedString.Key.font: font],
+            range: NSRange.init(location: 0, length: attributedMessage.length)
+        )
+        alertController.setValue(attributedMessage, forKey: "attributedMessage")
+        
+        return alertController
+    }
+    
 }
 
 public extension UIApplication {
@@ -230,28 +270,9 @@ public extension UIApplication {
                 .first?.windows
                 .filter({ $0.isKeyWindow }).first
         } else {
-            keyWindow = UIApplication.shared.windows
-                .filter({ $0.isKeyWindow }).first
+            keyWindow = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first
         }
         return keyWindow
     }
     
-}
-
-/// Queries the current controller.
-public func vd_queryCurrentController(
-    _ controller: UIViewController? = UIApplication.shared.vd_keyWindow?.rootViewController
-) -> UIViewController? {
-    if let navigationController = controller as? UINavigationController {
-        return vd_queryCurrentController(navigationController.visibleViewController)
-    }
-    if let tabBarController = controller as? UITabBarController {
-        if let selectedController = tabBarController.selectedViewController {
-            return vd_queryCurrentController(selectedController)
-        }
-    }
-    if let presentedController = controller?.presentedViewController {
-        return vd_queryCurrentController(presentedController)
-    }
-    return controller
 }

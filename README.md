@@ -30,7 +30,7 @@ pod 'AppStoreVersionDetector'
 ```
 AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { result in
     switch result {
-    case .success(let hasNew):
+    case .success(let hasNew, _):
         print("hasNew: \(hasNew)")
         break
     case .failure(let message):
@@ -40,10 +40,10 @@ AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { resul
 }
 ```
 
-- Goto AppStore
+- Open AppStore
 
 ```
-AppStoreVDetector.gotoAppStore(id: "15674646463")
+AppStoreVDetector.default.openAppStore(with: "15674646463")
 ```
 
 

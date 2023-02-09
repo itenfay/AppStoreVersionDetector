@@ -17,8 +17,8 @@ class ViewController: UIViewController {
         
         AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { result in
             switch result {
-            case .success(let hasNew):
-                print("hasNew: \(hasNew)")
+            case .success(let hasNew, let updatedInfo):
+                print("hasNew: \(hasNew), updatedInfo: \(updatedInfo ?? [:])")
                 break
             case .failure(let message):
                 print("message: \(message)")
@@ -26,7 +26,7 @@ class ViewController: UIViewController {
             }
         }
         
-        //AppStoreVDetector.gotoAppStore(id: "15674646463")
+        //AppStoreVDetector.openAppStore(with: "15674646463")
     }
     
     override func didReceiveMemoryWarning() {
