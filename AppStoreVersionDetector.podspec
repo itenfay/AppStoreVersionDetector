@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AppStoreVersionDetector'
-  s.version          = '0.2.0'
-  s.summary          = 'Detects the app version from AppStore.'
+  s.version          = '0.3.0'
+  s.summary          = 'Detect the app version from AppStore and support Objective-C.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-  Detects the app version from AppStore.
+  Detect the app version from AppStore and support Objective-C.
                        DESC
 
   s.homepage         = 'https://github.com/chenxing640/AppStoreVersionDetector'

@@ -11,11 +11,17 @@ import UIKit
 public typealias AppStoreVDetector = AppStoreVersionDetector
 
 /// Detect the online version from AppStore.
-final public class AppStoreVersionDetector {
+final public class AppStoreVersionDetector: NSObject {
     
-    public static let `default` = AppStoreVersionDetector()
+    @objc public static let `default` = AppStoreVersionDetector()
     
-    private init() {}
+    @objc public class func defaultDetector() -> AppStoreVersionDetector {
+        return Self.default
+    }
+    
+    private override init() {
+        super.init()
+    }
     
     public enum Result {
         case success(Bool, [String : String]?)
@@ -23,19 +29,22 @@ final public class AppStoreVersionDetector {
     }
     
     /// The app's id.
-    public private(set) var appId: String = ""
+    @objc public private(set) var appId: String = ""
+    /// Whether to has the new version.
+    @objc public private(set) var hasNewVersion: Bool = false
+    /// Whether to allow to present the alert controller.
+    @objc public var alertAllowed: Bool = true
+    
     /// Callback the result for the detecting.
     private var completionHandler: ((Result) -> Void)?
-    /// Whether to has the new version.
-    public private(set) var hasNewVersion: Bool = false
-    /// Whether to allow to present the alert controller.
-    public var alertAllowed: Bool = true
+    private var successBlock: ((Bool, [String : String]?) -> Void)?
+    private var failureBlock: ((String) -> Void)?
     
-    /// Detect the version only in release product.
+    /// Detect the version only in your app.
     /// - Parameters:
     ///   - id: The app's id.
     ///   - delay: The timeinterval delay to execute.
-    ///   - completionHandler: Callbacks the result for the detecting.
+    ///   - completionHandler: Callback the result for the detecting.
     public func onDetect(
         id: String,
         delayToExecute delay: TimeInterval = 0,
@@ -43,16 +52,38 @@ final public class AppStoreVersionDetector {
     {
         self.appId = id
         self.completionHandler = completionHandler
+        self.prepareToDetect(withDelay: delay)
+    }
+    
+    /// Detect the version only in your app.
+    /// - Parameters:
+    ///   - id: The app's id.
+    ///   - delay: The timeinterval delay to execute.
+    ///   - success: Callback the result for success.
+    ///   - failure: Callback the error information for failure.
+    @objc public func onDetect(
+        id: String,
+        delayToExecute delay: TimeInterval = 0,
+        success: @escaping (Bool, [String : String]?) -> Void,
+        failure: @escaping (String) -> Void)
+    {
+        self.appId = id
+        self.successBlock = success
+        self.failureBlock = failure
+        self.prepareToDetect(withDelay: delay)
+    }
+    
+    private func prepareToDetect(withDelay delay: TimeInterval) {
         if delay > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                self.onStart()
+                self.startDetecting()
             }
         } else {
-            self.onStart()
+            self.startDetecting()
         }
     }
     
-    private func onStart() {
+    private func startDetecting() {
         DispatchQueue.global(qos: .default).async {
             self.onFetchData()
         }
@@ -72,7 +103,8 @@ final public class AppStoreVersionDetector {
         let itsUrl = "https://itunes.apple.com/lookup?id=" + appId
         guard let url = URL.init(string: itsUrl) else {
             debugPrint("[VD] FetchData: url is null.")
-            self.completionHandler?(Result.failure("The url is null."))
+            self.completionHandler?(Result.failure("The requested url is null."))
+            self.failureBlock?("The requested url is null.")
             return
         }
         let dataTask = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
@@ -82,13 +114,14 @@ final public class AppStoreVersionDetector {
                     self?.onParse(with: _data)
                 } else {
                     debugPrint("[VD] FetchData: data is null.")
-                    self?.completionHandler?(Result.failure("The data is null."))
+                    self?.completionHandler?(Result.failure("The response data is null."))
+                    self?.failureBlock?("The response data is null.")
                 }
                 return
             }
             debugPrint("[VD] FetchData error: \(_error.localizedDescription)")
             self?.completionHandler?(Result.failure(_error.localizedDescription))
-            
+            self?.failureBlock?(_error.localizedDescription)
         }
         dataTask.resume()
     }
@@ -102,7 +135,8 @@ final public class AppStoreVersionDetector {
                   let results = dict["results"] as? NSArray,
                   let subDict = results.firstObject as? NSDictionary
             else {
-                self.completionHandler?(Result.failure("It cannot unable to parse data."))
+                self.completionHandler?(Result.failure("It cannot unable to parse the response data."))
+                self.failureBlock?("It cannot unable to parse the response data.")
                 return
             }
             
@@ -116,10 +150,11 @@ final public class AppStoreVersionDetector {
             debugPrint("[VD] Local BID: \(localBundleId), Online BID: \(onlineBundleId)")
             if localBundleId != onlineBundleId {
                 self.completionHandler?(Result.failure("The local and online bundle identifier is not same."))
+                self.failureBlock?("The local and online bundle identifier is not same.")
                 return
             }
             let version = "\(subDict["version"] ?? "")"
-            let compResult = self.compareVersion(with: version)
+            let compResult = self.compare(withOnlineVersion: version)
             if compResult == .orderedAscending {
                 debugPrint("[VD] The online version is greater than the local.")
                 let releaseNotes = "\(subDict["releaseNotes"] ?? "")"
@@ -141,30 +176,35 @@ final public class AppStoreVersionDetector {
                     self.hasNewVersion = true
                     let updatedInfo = ["version" : version, "releaseDate" : releaseDate, "releaseNotes" : releaseNotes]
                     self.completionHandler?(Result.success(true, updatedInfo))
+                    self.successBlock?(true, updatedInfo)
                     if !self.alertAllowed { return }
+                    let app = UIApplication.shared
                     let message = "版本号：\(version)\n" + "更新时间：\n\(releaseDate)\n" + "\n更新说明：\n\(releaseNotes)"
-                    let alertController = Self.makeAlertController(title: "发现新版本，是否前往更新？", message: message, alignment: .left, cancelTitle: "下次再说", defaultTitle: "立即更新") { _ in
+                    let alertController = app.vd_makeAlertController(title: "发现新版本，是否前往更新？", message: message, alignment: .left, cancelTitle: "下次再说", defaultTitle: "立即更新") { _ in
                         let vDetector = AppStoreVersionDetector.default
-                        Self.openAppStore(with: vDetector.appId)
+                        Self.openAppStore(withAppId: vDetector.appId)
                     }
-                    Self.queryCurrentController()?.present(alertController, animated: true)
+                    app.vd_queryCurrentController?.present(alertController, animated: true)
                 }
             } else if compResult == .orderedSame {
                 debugPrint("[VD] The local version is equal to the online.")
                 self.completionHandler?(Result.success(false, nil))
+                self.successBlock?(false, nil)
             } else {
                 debugPrint("[VD] The local version is greater than the online.")
                 self.completionHandler?(Result.success(false, nil))
+                self.successBlock?(false, nil)
             }
         } catch let error {
             debugPrint("[VD] Parse error: \(error)")
             self.completionHandler?(Result.failure(error.localizedDescription))
+            self.failureBlock?(error.localizedDescription)
         }
     }
     
     /// Open AppStore by the open url.
     /// - Parameter id: The app's identifier.
-    public static func openAppStore(with appId: String) {
+    @objc public static func openAppStore(withAppId appId: String) {
         let appUrl = "https://apps.apple.com/cn/app/id\(appId)?mt=8"
         guard let url = URL.init(string: appUrl) else {
             debugPrint("[VD] openAppStore: url is null.")
@@ -178,12 +218,12 @@ final public class AppStoreVersionDetector {
     /// - Parameters:
     ///   - url: A URL (Universal Resource Locator).
     ///   - completion: The block to execute with the results. Provide a value for this parameter if you want to be informed of the success or failure of opening the URL.
-    public static func openUrl(_ url: URL, completionHandler completion: ((Bool) -> Void)? = nil) {
+    @objc public static func openUrl(_ url: URL, completionHandler completion: ((Bool) -> Void)? = nil) {
         UIApplication.shared.open(url, options: [:], completionHandler: completion)
     }
     
     /// Compare with the local and online version, then return the comparison result.
-    public func compareVersion(with onlineVersion: String) -> ComparisonResult {
+    @objc public func compare(withOnlineVersion onlineVersion: String) -> ComparisonResult {
         let infoDictionary = Bundle.main.infoDictionary!
         let majorVersion = infoDictionary["CFBundleShortVersionString"] as! String
         let appVerNums = majorVersion.components(separatedBy: ".")
@@ -210,38 +250,81 @@ final public class AppStoreVersionDetector {
         }
     }
     
+}
+
+public extension UIApplication {
+    
+    /// The app's key window.
+    @objc var vd_keyWindow: UIWindow? {
+        var keyWindow: UIWindow?
+        if #available(iOS 13.0, *) {
+            keyWindow = UIApplication.shared.connectedScenes
+                .filter({ $0.activationState == .foregroundActive })
+                .map({ $0 as? UIWindowScene })
+                .compactMap({ $0 })
+                .first?.windows
+                .filter({ $0.isKeyWindow }).first
+        } else {
+            keyWindow = UIApplication.shared.windows
+                .filter({ $0.isKeyWindow }).first
+        }
+        return keyWindow
+    }
+    
+    @objc var vd_queryCurrentController: UIViewController? {
+        return self.vd_queryCurrentController(self.vd_keyWindow?.rootViewController)
+    }
+    
     /// Query the current controller.
-    public static func queryCurrentController(
-        _ controller: UIViewController? = UIApplication.shared.vd_keyWindow?.rootViewController
-    ) -> UIViewController? {
+    @objc func vd_queryCurrentController(_ controller: UIViewController?) -> UIViewController? {
         if let navigationController = controller as? UINavigationController {
-            return queryCurrentController(navigationController.visibleViewController)
+            return vd_queryCurrentController(navigationController.visibleViewController)
         }
         if let tabBarController = controller as? UITabBarController {
             if let selectedController = tabBarController.selectedViewController {
-                return queryCurrentController(selectedController)
+                return vd_queryCurrentController(selectedController)
             }
         }
         if let presentedController = controller?.presentedViewController {
-            return queryCurrentController(presentedController)
+            return vd_queryCurrentController(presentedController)
         }
         return controller
     }
     
     /// Make an object that displays an alert message.
-    public static func makeAlertController(title: String, message: String, alignment: NSTextAlignment = .center, font: UIFont = UIFont.systemFont(ofSize: 13, weight: .regular), cancelTitle: String?, cancelAction: ((String?) -> Void)? = nil, defaultTitle: String, defaultAction: ((String?) -> Void)? = nil) -> UIAlertController {
+    @objc func vd_makeAlertController(title: String, message: String, alignment: NSTextAlignment = .center, font: UIFont = UIFont.systemFont(ofSize: 13, weight: .regular), cancelTitle: String?, cancelAction: ((String?) -> Void)? = nil, defaultTitle: String, defaultAction: ((String?) -> Void)? = nil) -> UIAlertController {
+        return self.vd_makeAlertController(title: title,
+                                           message: message,
+                                           alignment: alignment,
+                                           font: font,
+                                           destructiveTitle: nil,
+                                           destructiveAction: nil,
+                                           cancelTitle: cancelTitle,
+                                           cancelAction: cancelAction,
+                                           defaultTitle: defaultTitle,
+                                           defaultAction: defaultAction)
+    }
+    
+    /// Make an object that displays an alert message.
+    @objc func vd_makeAlertController(title: String, message: String, alignment: NSTextAlignment = .center, font: UIFont = UIFont.systemFont(ofSize: 13, weight: .regular), destructiveTitle: String? = nil, destructiveAction: ((String?) -> Void)? = nil, cancelTitle: String? = nil, cancelAction: ((String?) -> Void)? = nil, defaultTitle: String, defaultAction: ((String?) -> Void)? = nil) -> UIAlertController {
         let alertController = UIAlertController.init(title: title, message: "", preferredStyle: .alert)
         
+        if let _destructiveTitle = destructiveTitle, !_destructiveTitle.isEmpty {
+            let _destructiveAction = UIAlertAction.init(title: _destructiveTitle, style: .destructive) { action in
+                destructiveAction?(action.title)
+            }
+            alertController.addAction(_destructiveAction)
+        }
         if let _cancelTitle = cancelTitle, !_cancelTitle.isEmpty {
-            let cancelAction = UIAlertAction.init(title: _cancelTitle, style: .cancel) { action in
+            let _cancelAction = UIAlertAction.init(title: _cancelTitle, style: .cancel) { action in
                 cancelAction?(action.title)
             }
-            alertController.addAction(cancelAction)
+            alertController.addAction(_cancelAction)
         }
-        let defaultAction = UIAlertAction.init(title: defaultTitle, style: .default) { action in
+        let _defaultAction = UIAlertAction.init(title: defaultTitle, style: .default) { action in
             defaultAction?(action.title)
         }
-        alertController.addAction(defaultAction)
+        alertController.addAction(_defaultAction)
         
         let attributedMessage = NSMutableAttributedString.init(string: message)
         let paragraph = NSMutableParagraphStyle.init()
@@ -253,26 +336,6 @@ final public class AppStoreVersionDetector {
         alertController.setValue(attributedMessage, forKey: "attributedMessage")
         
         return alertController
-    }
-    
-}
-
-public extension UIApplication {
-    
-    /// The app's key window.
-    var vd_keyWindow: UIWindow? {
-        var keyWindow: UIWindow?
-        if #available(iOS 13.0, *) {
-            keyWindow = UIApplication.shared.connectedScenes
-                .filter({ $0.activationState == .foregroundActive })
-                .map({ $0 as? UIWindowScene })
-                .compactMap({ $0 })
-                .first?.windows
-                .filter({ $0.isKeyWindow }).first
-        } else {
-            keyWindow = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first
-        }
-        return keyWindow
     }
     
 }

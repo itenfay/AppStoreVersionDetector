@@ -17,8 +17,8 @@ class ViewController: UIViewController {
         
         AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { result in
             switch result {
-            case .success(let hasNew, let updatedInfo):
-                print("hasNew: \(hasNew), updatedInfo: \(updatedInfo ?? [:])")
+            case .success(let hasNewVersion, let response):
+                print("hasNewVersion: \(hasNewVersion), response: \(response ?? [:])")
                 break
             case .failure(let message):
                 print("message: \(message)")
@@ -26,7 +26,13 @@ class ViewController: UIViewController {
             }
         }
         
-        //AppStoreVDetector.openAppStore(with: "15674646463")
+        //AppStoreVDetector.openAppStore(withAppId: "15674646463")
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let sample = VersionDetectObjcInvokeSample()
+        sample.test()
     }
     
     override func didReceiveMemoryWarning() {
@@ -34,4 +40,3 @@ class ViewController: UIViewController {
     }
     
 }
-

@@ -1,6 +1,6 @@
 # AppStoreVersionDetector
 
-Detects the app version from AppStore.
+Detect the app version from AppStore and support Objective-C.
 
 [![CI Status](https://img.shields.io/travis/chenxing640/AppStoreVersionDetector.svg?style=flat)](https://travis-ci.org/chenxing640/AppStoreVersionDetector)
 [![Version](https://img.shields.io/cocoapods/v/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
@@ -30,8 +30,8 @@ pod 'AppStoreVersionDetector'
 ```
 AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { result in
     switch result {
-    case .success(let hasNew, _):
-        print("hasNew: \(hasNew)")
+    case .success(let hasNewVersion, let response):
+        print("hasNewVersion: \(hasNewVersion), response: \(response ?? [:])")
         break
     case .failure(let message):
         print("message: \(message)")
@@ -43,9 +43,10 @@ AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { resul
 - Open AppStore
 
 ```
-AppStoreVDetector.openAppStore(with: "15674646463")
+AppStoreVDetector.openAppStore(withAppId: "15674646463")
 ```
 
+**To learn the usage in Objective-C, please view the file(VersionDetectObjcInvokeSample.m) in this project.**
 
 ## Author
 
