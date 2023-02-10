@@ -46,7 +46,8 @@ AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { resul
 AppStoreVDetector.openAppStore(withAppId: "15674646463")
 ```
 
-**To learn the usage in Objective-C, please view the file(VersionDetectObjcInvokeSample.m) in this project.**
+To learn the usage in Objective-C, please view the file(VersionDetectObjcInvokeSample.m) in this project.
+
 
 ## Author
 
