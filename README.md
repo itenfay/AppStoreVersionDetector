@@ -40,10 +40,16 @@ AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { resul
 }
 ```
 
-- Open AppStore
+- Go to AppStore
 
 ```
 AppStoreVDetector.openAppStore(withAppId: "15674646463")
+```
+
+- Go AppStore to write the review.
+
+```
+AppStoreVDetector.default.toWriteReview(withAppId: "15674646463")
 ```
 
 To learn the usage in Objective-C, please view the file(VersionDetectObjcInvokeSample.m) in this project.
