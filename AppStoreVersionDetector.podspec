@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AppStoreVersionDetector'
-  s.version          = '0.4.1'
+  s.version          = '0.4.2'
   s.summary          = 'Detect the app version from AppStore and support Objective-C.'
 
 # This description is used to generate tags and improve search results.
