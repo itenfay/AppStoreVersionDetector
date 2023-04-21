@@ -43,7 +43,7 @@ AppStoreVDetector.default.onDetect(id: "15674646463", delayToExecute: 5) { resul
 - Go to AppStore
 
 ```
-AppStoreVDetector.openAppStore(withAppId: "15674646463")
+AppStoreVDetector.default.toAppStore(withAppId: "15674646463")
 ```
 
 - Go AppStore to write the review.
