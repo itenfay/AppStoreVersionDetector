@@ -26,7 +26,8 @@ class ViewController: UIViewController {
             }
         }
         
-        //AppStoreVDetector.openAppStore(withAppId: "15674646463")
+        //AppStoreVDetector.default.toAppStore(withAppId: "15674646463")
+        //AppStoreVDetector.default.toWriteReview(withAppId: "15674646463")
     }
     
     override func viewDidAppear(_ animated: Bool) {

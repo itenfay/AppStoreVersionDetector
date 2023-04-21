@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AppStoreVersionDetector'
-  s.version          = '0.3.0'
+  s.version          = '0.4.1'
   s.summary          = 'Detect the app version from AppStore and support Objective-C.'
 
 # This description is used to generate tags and improve search results.
@@ -34,6 +34,8 @@ Pod::Spec.new do |s|
   #s.tvos.deployment_target = '9.0'
   
   s.source_files = 'AppStoreVersionDetector/Classes/**/*'
+  
+  s.requires_arc = true
   
   # s.resource_bundles = {
   #   'AppStoreVersionDetector' => ['AppStoreVersionDetector/Assets/*.png']
