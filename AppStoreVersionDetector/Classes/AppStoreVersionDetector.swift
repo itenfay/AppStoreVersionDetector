@@ -208,26 +208,27 @@ final public class AppStoreVersionDetector: NSObject {
     ///
     /// - Parameter id: The app's identifier.
     @objc public func toAppStore(withAppId appId: String) {
-        //"https://apps.apple.com/cn/app/id\(appId)?mt=8"
-        let appUrl = "itms-apps://itunes.apple.com/app/id\(appId)?mt=8"
-        guard let url = URL.init(string: appUrl) else {
-            debugPrint("[VD] toAppStore: url is null.")
+        //"itms-apps://itunes.apple.com/app/id\(appId)?mt=8"
+        //"itms-apps://itunes.apple.com/cn/app/id\(appId)?mt=8"
+        guard let url = URL(string: "https://itunes.apple.com/app/id\(appId)?mt=8")
+        else {
+            debugPrint("[VD] toAppStore: The url is null.")
             return
         }
         //if UIApplication.shared.canOpenURL(url) {}
-        self.openUrl(url)
+        self.openURL(url)
     }
     
     /// Go AppStore to write the review.
     ///
     /// - Parameter appId: The app's identifier.
     @objc public func toWriteReview(withAppId appId: String) {
-        guard let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appId)?action=write-review")
+        guard let url = URL(string: "https://itunes.apple.com/app/id\(appId)?action=write-review")
         else {
-            debugPrint("[VD] toWriteReview: url is null.")
+            debugPrint("[VD] toWriteReview: The url is null.")
             return
         }
-        self.openUrl(url)
+        self.openURL(url)
     }
     
     /// Attempts to asynchronously open the resource at the specified URL.
@@ -235,8 +236,13 @@ final public class AppStoreVersionDetector: NSObject {
     /// - Parameters:
     ///   - url: A URL (Universal Resource Locator).
     ///   - completion: The block to execute with the results. Provide a value for this parameter if you want to be informed of the success or failure of opening the URL.
-    @objc public func openUrl(_ url: URL, completionHandler completion: ((Bool) -> Void)? = nil) {
-        UIApplication.shared.open(url, options: [:], completionHandler: completion)
+    @objc public func openURL(_ url: URL?, completionHandler completion: ((Bool) -> Void)? = nil) {
+        guard let aURL = url else {
+            debugPrint("[VD] openURL: The url is null.")
+            completion?(false)
+            return
+        }
+        UIApplication.shared.open(aURL, options: [:], completionHandler: completion)
     }
     
     /// Compare with the local and online version, then return the comparison result.
