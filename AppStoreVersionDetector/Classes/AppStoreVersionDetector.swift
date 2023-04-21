@@ -13,7 +13,7 @@ public typealias AppStoreVDetector = AppStoreVersionDetector
 /// Detect the online version from AppStore.
 final public class AppStoreVersionDetector: NSObject {
     
-    @objc public static let `default` = AppStoreVersionDetector()
+    public static let `default` = AppStoreVersionDetector()
     
     @objc public class func defaultDetector() -> AppStoreVersionDetector {
         return Self.default
@@ -41,6 +41,7 @@ final public class AppStoreVersionDetector: NSObject {
     private var failureBlock: ((String) -> Void)?
     
     /// Detect the version only in your app.
+    ///
     /// - Parameters:
     ///   - id: The app's id.
     ///   - delay: The timeinterval delay to execute.
@@ -56,6 +57,7 @@ final public class AppStoreVersionDetector: NSObject {
     }
     
     /// Detect the version only in your app.
+    ///
     /// - Parameters:
     ///   - id: The app's id.
     ///   - delay: The timeinterval delay to execute.
@@ -119,7 +121,7 @@ final public class AppStoreVersionDetector: NSObject {
                 }
                 return
             }
-            debugPrint("[VD] FetchData error: \(_error.localizedDescription)")
+            debugPrint("[VD] FetchData: error=\(_error.localizedDescription)")
             self?.completionHandler?(Result.failure(_error.localizedDescription))
             self?.failureBlock?(_error.localizedDescription)
         }
@@ -182,7 +184,7 @@ final public class AppStoreVersionDetector: NSObject {
                     let message = "版本号：\(version)\n" + "更新时间：\n\(releaseDate)\n" + "\n更新说明：\n\(releaseNotes)"
                     let alertController = app.vd_makeAlertController(title: "发现新版本，是否前往更新？", message: message, alignment: .left, cancelTitle: "下次再说", defaultTitle: "立即更新") { _ in
                         let vDetector = AppStoreVersionDetector.default
-                        Self.openAppStore(withAppId: vDetector.appId)
+                        vDetector.toAppStore(withAppId: vDetector.appId)
                     }
                     app.vd_queryCurrentController?.present(alertController, animated: true)
                 }
@@ -202,23 +204,38 @@ final public class AppStoreVersionDetector: NSObject {
         }
     }
     
-    /// Open AppStore by the open url.
+    /// Go to AppStore by the open url.
+    ///
     /// - Parameter id: The app's identifier.
-    @objc public static func openAppStore(withAppId appId: String) {
-        let appUrl = "https://apps.apple.com/cn/app/id\(appId)?mt=8"
+    @objc public func toAppStore(withAppId appId: String) {
+        //"https://apps.apple.com/cn/app/id\(appId)?mt=8"
+        let appUrl = "itms-apps://itunes.apple.com/app/id\(appId)?mt=8"
         guard let url = URL.init(string: appUrl) else {
-            debugPrint("[VD] openAppStore: url is null.")
+            debugPrint("[VD] toAppStore: url is null.")
             return
         }
         //if UIApplication.shared.canOpenURL(url) {}
-        Self.openUrl(url)
+        self.openUrl(url)
+    }
+    
+    /// Go AppStore to write the review.
+    ///
+    /// - Parameter appId: The app's identifier.
+    @objc public func toWriteReview(withAppId appId: String) {
+        guard let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appId)?action=write-review")
+        else {
+            debugPrint("[VD] toWriteReview: url is null.")
+            return
+        }
+        self.openUrl(url)
     }
     
     /// Attempts to asynchronously open the resource at the specified URL.
+    ///
     /// - Parameters:
     ///   - url: A URL (Universal Resource Locator).
     ///   - completion: The block to execute with the results. Provide a value for this parameter if you want to be informed of the success or failure of opening the URL.
-    @objc public static func openUrl(_ url: URL, completionHandler completion: ((Bool) -> Void)? = nil) {
+    @objc public func openUrl(_ url: URL, completionHandler completion: ((Bool) -> Void)? = nil) {
         UIApplication.shared.open(url, options: [:], completionHandler: completion)
     }
     
@@ -271,6 +288,7 @@ public extension UIApplication {
         return keyWindow
     }
     
+    /// Return the current controller.
     @objc var vd_queryCurrentController: UIViewController? {
         return self.vd_queryCurrentController(self.vd_keyWindow?.rootViewController)
     }
@@ -291,7 +309,7 @@ public extension UIApplication {
         return controller
     }
     
-    /// Make an object that displays an alert message.
+    /// Make an `UIAlertController` object that displays an alert message.
     @objc func vd_makeAlertController(title: String, message: String, alignment: NSTextAlignment = .center, font: UIFont = UIFont.systemFont(ofSize: 13, weight: .regular), cancelTitle: String?, cancelAction: ((String?) -> Void)? = nil, defaultTitle: String, defaultAction: ((String?) -> Void)? = nil) -> UIAlertController {
         return self.vd_makeAlertController(title: title,
                                            message: message,
@@ -305,7 +323,7 @@ public extension UIApplication {
                                            defaultAction: defaultAction)
     }
     
-    /// Make an object that displays an alert message.
+    /// Make an `UIAlertController` object that displays an alert message.
     @objc func vd_makeAlertController(title: String, message: String, alignment: NSTextAlignment = .center, font: UIFont = UIFont.systemFont(ofSize: 13, weight: .regular), destructiveTitle: String? = nil, destructiveAction: ((String?) -> Void)? = nil, cancelTitle: String? = nil, cancelAction: ((String?) -> Void)? = nil, defaultTitle: String, defaultAction: ((String?) -> Void)? = nil) -> UIAlertController {
         let alertController = UIAlertController.init(title: title, message: "", preferredStyle: .alert)
         
