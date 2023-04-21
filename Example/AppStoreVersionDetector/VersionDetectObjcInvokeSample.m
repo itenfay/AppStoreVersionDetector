@@ -12,7 +12,7 @@
 
 - (void)test
 {
-    AppStoreVersionDetector *detector = [AppStoreVersionDetector default];
+    AppStoreVersionDetector *detector = [AppStoreVersionDetector defaultDetector];
     NSComparisonResult result = [detector compareWithOnlineVersion:@"2.3.10.1"];
     NSLog(@"Comparison Result: %ld", (long)result);
     NSLog(@"HasNewVersion: %@", detector.hasNewVersion ? @"YES" : @"NO");
@@ -33,8 +33,8 @@
         NSLog(@"Cancel title: %@", title);
     } defaultTitle:@"确定" defaultAction:^(NSString * _Nullable title) {
         NSLog(@"Default title: %@", title);
-        [AppStoreVersionDetector openAppStoreWithAppId:@"15674646463"];
-        //[AppStoreVersionDetector openUrl:[NSURL URLWithString:@"https://www.baidu.com"] completionHandler:^(BOOL result) {}];
+        [AppStoreVersionDetector.defaultDetector toAppStoreWithAppId:@"15674646463"];
+        //[AppStoreVersionDetector.defaultDetector openUrl:[NSURL URLWithString:@"https://www.baidu.com"] completionHandler:^(BOOL result) {}];
     }];
     [currVC presentViewController:alertController animated:YES completion:nil];
 }
