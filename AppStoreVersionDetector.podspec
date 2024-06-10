@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AppStoreVersionDetector'
-  s.version          = '0.4.2'
+  s.version          = '1.0.0'
   s.summary          = 'Detect the app version from AppStore and support Objective-C.'
 
 # This description is used to generate tags and improve search results.
@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
   Detect the app version from AppStore and support Objective-C.
                        DESC
 
-  s.homepage         = 'https://github.com/chenxing640/AppStoreVersionDetector'
+  s.homepage         = 'https://github.com/itenfay/AppStoreVersionDetector'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'chenxing' => 'chenxing640@foxmail.com' }
-  s.source           = { :git => 'https://github.com/chenxing640/AppStoreVersionDetector.git', :tag => s.version.to_s }
+  s.author           = { 'Tenfay' => 'hansen981@126.com' }
+  s.source           = { :git => 'https://github.com/itenfay/AppStoreVersionDetector.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.swift_versions = ['4.2', '5.0']

@@ -3,7 +3,7 @@ This application makes use of the following third party libraries:
 
 ## AppStoreVersionDetector
 
-Copyright (c) 2022 chenxing <cg@chenxing.com>
+Copyright (c) 2022 Tenfay <hansen981@126.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

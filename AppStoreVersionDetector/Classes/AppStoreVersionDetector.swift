@@ -2,7 +2,7 @@
 //  AppStoreVersionDetector.swift
 //  AppStoreVersionDetector
 //
-//  Created by chenxing on 2021/7/20.
+//  Created by Tenfay on 2021/7/20.
 //
 
 import UIKit
