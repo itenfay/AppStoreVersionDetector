@@ -1,5 +1,5 @@
 PODS:
-  - AppStoreVersionDetector (0.1.0)
+  - AppStoreVersionDetector (1.0.0)
 
 DEPENDENCIES:
   - AppStoreVersionDetector (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  AppStoreVersionDetector: 8e43fed38a5800efdab4a6e6c886d91fd5e1c06f
+  AppStoreVersionDetector: 8d67562d3b29461f90e06a9accd294adf256a07b
 
 PODFILE CHECKSUM: e187c7701ee2774d9970b60decfa76f4883c6a43
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.15.2
