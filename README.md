@@ -2,7 +2,7 @@
 
 Detect the app version from AppStore and support Objective-C.
 
-[![CI Status](https://img.shields.io/travis/itenfay/AppStoreVersionDetector.svg?style=flat)](https://travis-ci.org/itenfay/AppStoreVersionDetector)
+<!--[![CI Status](https://img.shields.io/travis/itenfay/AppStoreVersionDetector.svg?style=flat)](https://travis-ci.org/itenfay/AppStoreVersionDetector)-->
 [![Version](https://img.shields.io/cocoapods/v/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
 [![License](https://img.shields.io/cocoapods/l/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
 [![Platform](https://img.shields.io/cocoapods/p/AppStoreVersionDetector.svg?style=flat)](https://cocoapods.org/pods/AppStoreVersionDetector)
@@ -58,3 +58,4 @@ To learn the usage in Objective-C, please view the file(VersionDetectObjcInvokeS
 ## License
 
 AppStoreVersionDetector is available under the MIT license. See the LICENSE file for more info.
+
